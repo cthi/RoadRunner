@@ -17,7 +17,7 @@ trait ProcessRunner {
     case (stdout, stderr, exitCode) => ProgramError(stdout, stderr, exitCode)
   }
 
-  def withProgram(program: String)(action: String => Unit): Unit = {
+  def withProgram(program: String)(action: String => ProgramResult): ProgramResult = {
     val fileName = Random.alphanumeric.take(20).mkString
     val file = new File(fileName)
     val writer = new BufferedWriter(new FileWriter(file))
@@ -25,9 +25,11 @@ trait ProcessRunner {
     writer.write(program)
     writer.close()
 
-    action(fileName)
+    val result = action(fileName)
 
     file.delete()
+
+    result
   }
 
   private def runProcess(command: String) = {
