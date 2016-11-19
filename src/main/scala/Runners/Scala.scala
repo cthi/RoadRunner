@@ -5,6 +5,6 @@ import entities.Run
 
 class Scala extends Actor {
   override def receive: Receive = {
-    case Run(program: String) =>
+    case Run(program) =>
   }
 }
