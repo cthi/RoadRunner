@@ -1,14 +1,12 @@
 package Runners
 
 import akka.actor.{Actor, PoisonPill, Props}
-import entities.{Run, Submission, SubmissionWithInput, Test}
+import entities.{SubmissionWithInput, Run}
 
 class SubmissionProcessor extends Actor {
   override def receive: Receive = {
-    case Submission(program, language) =>
-      runSubmission(program, languageFromSymbol(language).asInstanceOf[Class[Actor]])
     case SubmissionWithInput(program, language, input) =>
-      testSubmission(program, input, languageFromSymbol(language).asInstanceOf[Class[Actor]])
+      runSubmission(program, input, languageFromSymbol(language).asInstanceOf[Class[Actor]])
   }
 
   def languageFromSymbol(language: Symbol) = {
@@ -22,17 +20,10 @@ class SubmissionProcessor extends Actor {
     }
   }
 
-  def testSubmission(program: String, input: String, language: Class[Actor]) = {
+  def runSubmission(program: String, input: String, language: Class[Actor]) = {
     val runner = context.actorOf(Props(language))
 
-    runner forward Test(program, input)
-    runner ! PoisonPill
-  }
-
-  def runSubmission(program: String, language: Class[Actor]) = {
-    val runner = context.actorOf(Props(language))
-
-    runner forward Run(program)
+    runner forward Run(program, input)
     runner ! PoisonPill
   }
 }

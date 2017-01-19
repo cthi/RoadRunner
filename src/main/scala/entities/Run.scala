@@ -1,3 +1,3 @@
 package entities
 
-case class Run(program: String)
+case class Run(program: String, input: String)

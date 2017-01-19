@@ -5,9 +5,9 @@ import entities.Run
 
 class Java extends Actor with ProcessRunner {
   override def receive: Receive = {
-    case Run(program: String) =>
+    case Run(program: String, input: String) =>
       sender() ! withProgram(program) { fileName =>
-        execute(s"javac $fileName")
+        executeWithInput(s"javac $fileName", input)
       }
   }
 }

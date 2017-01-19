@@ -14,12 +14,6 @@ final case class ProgramFailure(stdout: String) extends ProgramResult
 final case class ProgramError(stdout: String, stderr: String, exitCode: Int) extends ProgramResult
 
 trait ProcessRunner {
-  def execute(command: String) = runProcess(command) match {
-    case (stdout, stderr, 0) => ProgramSuccess(stdout)
-    case (stdout, stderr, 1) => ProgramFailure(stderr)
-    case (stdout, stderr, exitCode) => ProgramError(stdout, stderr, exitCode)
-  }
-
   def executeWithInput(command: String, input: String) = runProcessWithInput(command, input) match {
     case (stdout, stderr, 0) => ProgramSuccess(stdout)
     case (stdout, stderr, 1) => ProgramFailure(stderr)
@@ -39,21 +33,6 @@ trait ProcessRunner {
     file.delete()
 
     result
-  }
-
-  private def runProcess(command: String) = {
-    val stdout = new ByteArrayOutputStream
-    val stderr = new ByteArrayOutputStream
-
-    val stdoutWriter = new PrintWriter(stdout)
-    val stderrWriter = new PrintWriter(stderr)
-
-    val exitCode = command ! ProcessLogger(stdoutWriter.println, stderrWriter.println)
-
-    stdoutWriter.close()
-    stderrWriter.close()
-
-    (stdout.toString, stderr.toString, exitCode)
   }
 
   private def runProcessWithInput(command: String, input: String) = {
